@@ -2,7 +2,7 @@ UNIK(1) "Filters"
 
 # NAME
 
-unik - print duplicate lines, keeping original line order
+unik - print unique lines, keeping original line order
 
 # SYNOPSIS
 
