@@ -38,7 +38,7 @@ patch-bash: bin/f
 patch-env: $(FILTERS)
 	@sed "s|#!/usr/bin/env|#!$(ENV)|g" -i $<
 patch-sh: bin/sortc
-	@sed "s|#!/bin/sh|#!$(ENV)|g" -i $<
+	@sed "s|#!/bin/sh|#!$(SH)|g" -i $<
 
 .PHONY: mostlyclean distclean clean
 mostlyclean:
