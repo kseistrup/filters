@@ -13,6 +13,11 @@ GZIP       = gzip
 SCDOC      = scdoc
 INSTALL    = install
 
+AWK       ?= $(shell sh -c 'command -v awk  || echo "/usr/bin/awk"')
+BASH      ?= $(shell sh -c 'command -v bash || echo "/usr/bin/bash"')
+ENV       ?= $(shell sh -c 'command -v env  || echo "/usr/bin/env"')
+SH        ?= $(shell sh -c 'command -v sh   || echo "/bin/sh"')
+
 .PHONY: all
 all: $(FILTERS) $(MANPAGES)
 
@@ -25,6 +30,15 @@ man/%.1: man/%.1.md
 
 man/%.1.gz: man/%.1
 	@$(GZIP) -c $< >$@
+
+patch-awk: bin/unik bin/uniqc
+	@sed "s|#!/usr/bin/awk|#!$(AWK)|g" -i $<
+patch-bash: bin/f
+	@sed "s|#!/usr/bin/bash|#!$(BASH)|g" -i $<
+patch-env: $(FILTERS)
+	@sed "s|#!/usr/bin/env|#!$(ENV)|g" -i $<
+patch-sh: bin/sortc
+	@sed "s|#!/bin/sh|#!$(ENV)|g" -i $<
 
 .PHONY: mostlyclean distclean clean
 mostlyclean:

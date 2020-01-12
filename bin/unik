@@ -1,7 +1,7 @@
-#!/usr/bin/env -S awk -f
+#!/usr/bin/awk -f
 # -*- awk -*-
 
-# filters/unik (2020-01-11)
+# filters/unik (2020-01-12)
 #
 # Print unique lines, keeping original line order.
 # Think “sort | uniq” without sorting first.
