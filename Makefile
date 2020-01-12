@@ -1,4 +1,4 @@
-# OH, HAI!
+# OH, HAI! :)
 
 PREFIX    ?= /usr/local
 BINDIR    ?= $(DESTDIR)$(PREFIX)/bin/
@@ -22,7 +22,9 @@ SH        ?= $(shell sh -c 'command -v sh   || echo "/bin/sh"')
 all: $(FILTERS) $(MANPAGES)
 
 install: $(FILTERS) $(ZMANPAGES)
+	@test -d $(BINDIR) || mkdir -p $(BINDIR)
 	$(INSTALL) -m 0755 $(FILTERS) $(BINDIR)
+	@test -d $(MANDIR) || mkdir -p $(MANDIR)
 	$(INSTALL) -m 0644 $(ZMANPAGES) $(MANDIR)
 
 man/%.1: man/%.1.md
