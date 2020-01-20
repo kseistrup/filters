@@ -1,7 +1,7 @@
-#!/bin/sh
-# -*- sh -*-
+#!/usr/bin/awk -f
+# -*- awk -*-
 
-# filters/sortc (2020-01-11)
+# filters/sortc (2020-01-20)
 #
 # Sort unique lines according to their number of occurrence.
 # Think “sort | uniq -c | sort -rn” without the initial sort.
@@ -10,13 +10,11 @@
 # Released under the GNU General Public License v3+.
 # Please see https://github.com/kseistrup/filters for details.
 
-awk '
-  { seen[$0]++ }
+{ seen[$0]++ }
 
-  END {
-    for (key in seen)
-      print sprintf("%7d\t%s", seen[key], key)
-  }
-' | sort -rn
+END {
+  for (key in seen)
+    print sprintf("%7d\t%s", seen[key], key) | "sort -rn"
+}
 
 # eof
