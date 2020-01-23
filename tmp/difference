@@ -1,0 +1,85 @@
+#!/bin/sh
+# -*- sh -*-
+
+# filters/difference (2020-01-21)
+#
+# Print lines present in one file but not in the other
+#
+# Think: FILE1 - FILE2
+#
+# Copyright ©2020 Klaus Alexander Seistrup <klaus@seistrup.dk>.
+# Released under the GNU General Public License v3+.
+# Please see https://github.com/kseistrup/filters for details.
+
+ME="${0##*/}"
+
+die () {
+  test -n "$*" && {
+    echo "$ME: $*" >&2
+    exit 1
+  }
+  exit 0
+}
+
+usage () {
+  cat << __EOT__
+$ME - print lines present in FILE1 but not in FILE2 (FILE1-FILE2)
+
+Usage: $ME [OPTIONS]
+   or: $ME FILE1 [FILE2]
+
+OPTIONS are:
+
+  -h, --help	print this help text and exit
+
+POSITIONAL arguments
+
+  FILE1, FILE2	files to compare
+
+If FILE2 is omitted, or if ‘-’ is used for either FILE1 or FILE2,
+$ME will read from standard input (/dev/stdin) instead.
+
+Elements with multiple occurances in any of the files will only
+be printed once.
+__EOT__
+}
+
+case "$1" in
+  -h | --help | -help )
+    usage
+    exit 0
+  ;;
+esac
+
+file_or_stdin () {
+  _file="$1"
+
+  case "$_file" in
+    '' | '-' )
+      _file='/dev/stdin'
+    ;;
+  esac
+
+  test -r "$_file" || die "cannot read $_file"
+
+  # Should we have used readlink?
+  echo "$_file"
+}
+
+test "$#" -gt 2 && die 'expected at most 2 arguments, got' "$#"
+
+FILE1=$(file_or_stdin "$1")
+FILE2=$(file_or_stdin "$2")
+
+test "$FILE1" = "$FILE2" && die
+
+# shellcheck disable=SC2016
+exec awk '
+  # This will only be true while consuming the first file
+  NR == FNR { file1[$0] = 1; next }
+
+  # Records from the second file will be processed here
+  ++file2[$0] == 1 && !($0 in file1) { print }
+' "$FILE2" "$FILE1"  # order of arguments deliberately reversed
+
+# eof

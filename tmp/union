@@ -1,0 +1,80 @@
+#!/bin/sh
+# -*- sh -*-
+
+# filters/union (2020-01-21)
+#
+# Print unique lines from two files
+# Think: FILE1 | FILE2
+#
+# Copyright ©2020 Klaus Alexander Seistrup <klaus@seistrup.dk>.
+# Released under the GNU General Public License v3+.
+# Please see https://github.com/kseistrup/filters for details.
+
+ME="${0##*/}"
+
+die () {
+  test -n "$*" && {
+    echo "$ME: $*" >&2
+    exit 1
+  }
+  exit 0
+}
+
+usage () {
+  cat << __EOT__
+$ME - print unique lines from both FILE1 and FILE2
+
+Usage: $ME [OPTIONS]
+   or: $ME FILE1 [FILE2]
+
+OPTIONS are:
+
+  -h, --help	print this help text and exit
+
+POSITIONAL arguments
+
+  FILE1, FILE2	files to read from
+
+If FILE2 is omitted, or if ‘-’ is used for either FILE1 or FILE2,
+$ME will read from standard input (/dev/stdin) instead.
+__EOT__
+}
+
+case "$1" in
+  -h | --help | -help )
+    usage
+    exit 0
+  ;;
+esac
+
+file_or_stdin () {
+  _file="$1"
+
+  case "$_file" in
+    '' | '-' )
+      _file='/dev/stdin'
+    ;;
+  esac
+
+  test -r "$_file" || die "cannot read $_file"
+
+  # Should we have used readlink?
+  echo "$_file"
+}
+
+test "$#" -gt 2 && die 'expected at most 2 arguments, got' "$#"
+
+FILE1=$(file_or_stdin "$1")
+FILE2=$(file_or_stdin "$2")
+
+# shellcheck disable=SC2016
+case "$FILE1" in
+  "$FILE2" )
+    exec awk '!seen[$0]++' "$FILE1"
+  ;;
+  * )
+    exec awk '!seen[$0]++' "$FILE1" "$FILE2"
+  ;;
+esac
+
+# eof
